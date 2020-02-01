@@ -20,14 +20,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
+        <ImageButton
             android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="4"
+            android:background="@color/colorPrimaryDark"
             android:paddingTop="16dp"
             android:paddingBottom="16dp"
-            tools:srcCompat="@drawable/player_header_icon" />
+            app:srcCompat="@drawable/player_header_icon" />
 
         <TextView
             android:id="@+id/player_header_name"

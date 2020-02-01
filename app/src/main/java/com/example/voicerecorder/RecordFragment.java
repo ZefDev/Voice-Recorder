@@ -44,6 +44,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
 
         navController = Navigation.findNavController(view);
         listBtn = view.findViewById(R.id.record_list_btn);
+        recordBtn = view.findViewById(R.id.record_btn);
         listBtn.setOnClickListener(this);
         recordBtn.setOnClickListener(this);
     }

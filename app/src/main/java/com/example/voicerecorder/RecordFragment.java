@@ -12,16 +12,19 @@ import androidx.navigation.Navigation;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RecordFragment extends Fragment {
+public class RecordFragment extends Fragment implements View.OnClickListener{
 
     private NavController navController;
-    private ImageView listBtn;
+    private ImageButton listBtn;
+    private ImageButton recordBtn;
+    private boolean isRecording = false;
 
     public RecordFragment() {
         // Required empty public constructor
@@ -41,11 +44,25 @@ public class RecordFragment extends Fragment {
 
         navController = Navigation.findNavController(view);
         listBtn = view.findViewById(R.id.record_list_btn);
-        listBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                navController.navigate(R.id.action_recordFragment_to_audioListFragment);
-            }
-        });
+        listBtn.setOnClickListener(this);
+        recordBtn.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v){
+       switch (v.getId()){
+           case R.id.record_list_btn:
+               navController.navigate(R.id.action_recordFragment_to_audioListFragment);
+               break;
+           case R.id.record_btn:
+                if (isRecording){
+                    recordBtn.setImageDrawable(getResources().getDrawable(R.drawable.record_btn_stopped));
+                    isRecording = false;
+                }else {
+                    recordBtn.setImageDrawable(getResources().getDrawable(R.drawable.record_btn_recording));
+                    isRecording=true;
+                }
+               break;
+       }
     }
 }

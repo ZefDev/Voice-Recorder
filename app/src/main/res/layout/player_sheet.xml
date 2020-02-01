@@ -69,8 +69,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/player_head" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/imageView2"
+        android:background="@color/colorPrimary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -81,9 +82,10 @@
         app:layout_constraintTop_toBottomOf="@+id/textView3"
          />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/imageView3"
         android:layout_width="wrap_content"
+        android:background="@color/colorPrimary"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@+id/imageView2"
         app:layout_constraintEnd_toStartOf="@+id/imageView2"
@@ -92,9 +94,10 @@
         android:padding="16dp"
         app:srcCompat="@drawable/player_back_btn" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/imageView4"
         android:layout_width="wrap_content"
+        android:background="@color/colorPrimary"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@+id/imageView2"
         app:layout_constraintEnd_toEndOf="parent"

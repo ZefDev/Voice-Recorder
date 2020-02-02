@@ -7,6 +7,7 @@
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
     android:background="@drawable/player_bg"
     app:behavior_hideable="true"
+    android:id="@+id/player_sheet"
     app:behavior_peekHeight="70dp">
 
     <LinearLayout

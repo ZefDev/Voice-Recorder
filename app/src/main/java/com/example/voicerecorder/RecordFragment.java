@@ -1,19 +1,33 @@
 package com.example.voicerecorder;
 
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.pm.PackageManager;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 
 /**
@@ -25,6 +39,12 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
     private ImageButton listBtn;
     private ImageButton recordBtn;
     private boolean isRecording = false;
+    private int PERMISSION_CODE = 20;
+    private String recordPermission = Manifest.permission.RECORD_AUDIO;
+    private MediaRecorder mediaRecorder;
+    private String recordFile;
+    private Chronometer timer;
+    private TextView fileNametext;
 
     public RecordFragment() {
         // Required empty public constructor
@@ -45,6 +65,8 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
         navController = Navigation.findNavController(view);
         listBtn = view.findViewById(R.id.record_list_btn);
         recordBtn = view.findViewById(R.id.record_btn);
+        timer = view.findViewById(R.id.record_timer);
+        fileNametext = view.findViewById(R.id.record_filename);
         listBtn.setOnClickListener(this);
         recordBtn.setOnClickListener(this);
     }
@@ -57,13 +79,56 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
                break;
            case R.id.record_btn:
                 if (isRecording){
+                    stopRecording();
                     recordBtn.setImageDrawable(getResources().getDrawable(R.drawable.record_btn_stopped));
                     isRecording = false;
                 }else {
-                    recordBtn.setImageDrawable(getResources().getDrawable(R.drawable.record_btn_recording));
-                    isRecording=true;
+                    if(checkPromission()) {
+                        startRecording();
+                        recordBtn.setImageDrawable(getResources().getDrawable(R.drawable.record_btn_recording));
+                        isRecording = true;
+                    }
                 }
                break;
        }
+    }
+
+    private void stopRecording() {
+        timer.stop();
+        mediaRecorder.stop();
+        mediaRecorder.release();
+        mediaRecorder = null;
+        fileNametext.setText("Recording stoped, file saved: "+ recordFile);
+    }
+
+    private void startRecording() {
+        timer.setBase(SystemClock.elapsedRealtime());
+        timer.start();
+        String recordPath = getActivity().getExternalFilesDir("/").getAbsolutePath();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", Locale.ROOT);
+        Date now = new Date();
+        recordFile = "filename"+ formatter.format(now)+".3gp";
+        fileNametext.setText("Recording "+ recordFile);
+        mediaRecorder = new MediaRecorder();
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mediaRecorder.setOutputFile(recordPath + "/"+ recordFile);
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+        try {
+            mediaRecorder.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mediaRecorder.start();
+    }
+
+    private boolean checkPromission() {
+        if (ActivityCompat.checkSelfPermission(getContext(), recordPermission)== PackageManager.PERMISSION_GRANTED){
+            return true;
+        }else {
+            ActivityCompat.requestPermissions((Activity) getContext(),new String[]{recordPermission},PERMISSION_CODE);
+            return false;
+        }
     }
 }

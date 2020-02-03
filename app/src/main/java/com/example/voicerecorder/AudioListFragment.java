@@ -76,13 +76,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         audioList.setLayoutManager(new LinearLayoutManager(getContext()));
         audioList.setAdapter(audioListAdapter);
 
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                stopAUDIO();
-                playerHeader.setText(R.string.finished);
-            }
-        });
+
 
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override

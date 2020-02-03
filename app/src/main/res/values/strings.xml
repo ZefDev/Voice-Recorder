@@ -6,4 +6,7 @@
     <string name="press_the_micro_button">Press the micro button \n to start recording </string>
     <string name="media_player">Media Player</string>
     <string name="not_playing">Not Playing</string>
+    <string name="stoped">Stoped</string>
+    <string name="playing">Playing</string>
+    <string name="finished">Finished</string>
 </resources>

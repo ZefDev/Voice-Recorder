@@ -118,14 +118,18 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                pauseAudio();
+                if(fileToPlay!=null) {
+                    pauseAudio();
+                }
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                int progress = seekBar.getProgress();
-                mediaPlayer.seekTo(progress);
-                resumeAudio();
+                if(fileToPlay!=null) {
+                    int progress = seekBar.getProgress();
+                    mediaPlayer.seekTo(progress);
+                    resumeAudio();
+                }
             }
         });
     }
@@ -135,7 +139,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         fileToPlay = file;
         if (isPlaying){
             stopAUDIO();
-
+            playAudio(fileToPlay);
         }else {
 
             playAudio(fileToPlay);
@@ -202,7 +206,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
 
         playerSeekBar.setMax(mediaPlayer.getDuration());
         seekBarHandler = new Handler();
-       updateRunnable();
+        updateRunnable();
         seekBarHandler.postDelayed(runnableSeekBar,0);
     }
 
@@ -210,7 +214,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         runnableSeekBar = new Runnable() {
             @Override
             public void run() {
-                playerSeekBar.setProgress(mediaPlayer.getAudioSessionId());
+                playerSeekBar.setProgress(mediaPlayer.getCurrentPosition());
                 seekBarHandler.postDelayed(this,500);
             }
         };
@@ -219,8 +223,8 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
     @Override
     public void onStop() {
         super.onStop();
-        if(isPlaying) {
+        //if(isPlaying) {
             stopAUDIO();
-        }
+        //}
     }
 }

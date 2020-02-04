@@ -3,6 +3,8 @@ package com.example.voicerecorder;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
 import android.os.Bundle;
@@ -75,7 +77,24 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
     public void onClick(View v){
        switch (v.getId()){
            case R.id.record_list_btn:
-               navController.navigate(R.id.action_recordFragment_to_audioListFragment);
+
+               if(isRecording){
+                   AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+                   alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                       @Override
+                       public void onClick(DialogInterface dialog, int which) {
+
+                           navController.navigate(R.id.action_recordFragment_to_audioListFragment);
+                           isRecording=false;
+                       }
+                   });
+                   alertDialog.setNegativeButton("Cancel", null);
+                   alertDialog.setTitle("Audio still recording");
+                   alertDialog.setMessage("Are you sure, you want to stop the recording?");
+                   alertDialog.create().show();
+               }else {
+                   navController.navigate(R.id.action_recordFragment_to_audioListFragment);
+               }
                break;
            case R.id.record_btn:
                 if (isRecording){
@@ -129,6 +148,14 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
         }else {
             ActivityCompat.requestPermissions((Activity) getContext(),new String[]{recordPermission},PERMISSION_CODE);
             return false;
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (isRecording) {
+            startRecording();
         }
     }
 }

@@ -13,10 +13,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -42,7 +44,9 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
     private ImageButton playBtn;
     private TextView playerHeader;
     private TextView playerFilename;
-
+    private SeekBar playerSeekBar;
+    private Handler seekBarHandler;
+    private Runnable runnableSeekBar;
     public AudioListFragment() {
         // Required empty public constructor
     }
@@ -65,6 +69,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         playBtn = view.findViewById(R.id.player_btn_play);
         playerHeader = view.findViewById(R.id.player_header_title);
         playerFilename = view.findViewById(R.id.player_file_name);
+        playerSeekBar = view.findViewById(R.id.player_seekbar);
 
 
         String path = getActivity().getExternalFilesDir("/").getAbsolutePath();
@@ -91,20 +96,71 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
 
             }
         });
+
+        playBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isPlaying){
+                    pauseAudio();
+                }else {
+                    if (fileToPlay != null) {
+                        resumeAudio();
+                    }
+
+                }
+            }
+        });
+        playerSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                pauseAudio();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                int progress = seekBar.getProgress();
+                mediaPlayer.seekTo(progress);
+                resumeAudio();
+            }
+        });
     }
 
     @Override
     public void onClickListener(File file, int position) {
+        fileToPlay = file;
         if (isPlaying){
             stopAUDIO();
 
         }else {
-            fileToPlay = file;
+
             playAudio(fileToPlay);
 
         }
     }
 
+    private void pauseAudio(){
+        mediaPlayer.pause();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            playBtn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.player_play_btn,null));
+        }
+        isPlaying = false;
+        seekBarHandler.removeCallbacks(runnableSeekBar);
+    }
+
+    private void resumeAudio(){
+        mediaPlayer.start();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            playBtn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.player_pause_btn,null));
+        }
+        isPlaying = true;
+        updateRunnable();
+        seekBarHandler.postDelayed(runnableSeekBar,0);
+    }
 
     private void stopAUDIO() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -112,6 +168,8 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
             playerHeader.setText(R.string.stoped);
         }
         isPlaying = false;
+        mediaPlayer.stop();
+        seekBarHandler.removeCallbacks(runnableSeekBar);
     }
 
 
@@ -141,5 +199,28 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                 playerHeader.setText(R.string.finished);
             }
         });
+
+        playerSeekBar.setMax(mediaPlayer.getDuration());
+        seekBarHandler = new Handler();
+       updateRunnable();
+        seekBarHandler.postDelayed(runnableSeekBar,0);
+    }
+
+    private void updateRunnable() {
+        runnableSeekBar = new Runnable() {
+            @Override
+            public void run() {
+                playerSeekBar.setProgress(mediaPlayer.getAudioSessionId());
+                seekBarHandler.postDelayed(this,500);
+            }
+        };
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(isPlaying) {
+            stopAUDIO();
+        }
     }
 }
